@@ -1,0 +1,4 @@
+enum Ammo
+{
+    BULLETS, ROCKETS
+};
