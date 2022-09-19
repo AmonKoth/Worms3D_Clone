@@ -1,4 +1,0 @@
-enum Ammo
-{
-    BULLETS, ROCKETS
-};

@@ -40,6 +40,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "SwitchWorm",
+                    "type": "Button",
+                    "id": "0cf073fc-173d-4b05-b86a-c547a25917c9",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -271,6 +280,17 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b973ae80-c2d8-4a65-aee9-9348312e53b0",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "SwitchWorm",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

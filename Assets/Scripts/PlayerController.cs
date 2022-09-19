@@ -17,12 +17,13 @@ public class PlayerController : MonoBehaviour
     private Vector2 _moveDirection = new Vector2(0, 0);
     private Vector2 _lookDirection = new Vector2(0, 0);
     private Vector2 _lastLookDir;
-    private float _rotateDir;
     //Worms
     private Worm[] worms = null;
     private Worm _activeWorm = null;
     private int _activeWormNumber = 0;
     private int _AliveWorms = 0;
+
+
 
     //Handle Inputs
     public void OnMove(InputAction.CallbackContext context)
@@ -37,7 +38,7 @@ public class PlayerController : MonoBehaviour
     {
         if (context.performed)
         {
-            ActiveWormChanger();
+            _activeWorm.Fire();
         }
     }
     public void OnJump(InputAction.CallbackContext context)
@@ -47,27 +48,31 @@ public class PlayerController : MonoBehaviour
             _activeWorm.Jump();
         }
     }
+    public void OnWormSwitch(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            ActiveWormChanger();
+        }
+    }
 
     private void ActiveWormChanger()
     {
+        _activeWorm.SetIsActive(false);
         _activeWormNumber++;
         if (_activeWormNumber == worms.Length)
         {
             _activeWormNumber = 0;
         }
         _activeWorm = worms[_activeWormNumber];
+        _activeWorm.SetIsActive(true);
     }
 
     private void HandleAim()
     {
         _lastLookDir += new Vector2(-_lookDirection.y * _ySensitivity, _lookDirection.x * _xSensitivity);
         _lastLookDir.x = Mathf.Clamp(_lastLookDir.x, -_xClamp, _xClamp);
-        //_activeWorm.Aim(_lastLookDir);
-    }
-    private void HandleRotate()
-    {
-        _rotateDir += -_lookDirection.x * _xSensitivity;
-        _activeWorm.Aim(_rotateDir);
+        _activeWorm.Aim(_lastLookDir);
     }
 
 
@@ -75,12 +80,13 @@ public class PlayerController : MonoBehaviour
     {
         worms = GetComponentsInChildren<Worm>();
         _activeWorm = worms[_activeWormNumber];
+        _activeWorm.SetIsActive(true);
         _AliveWorms = worms.Length;
     }
 
     private void Update()
     {
         _activeWorm.HandleMovement(_moveDirection);
-        HandleRotate();
+        HandleAim();
     }
 }

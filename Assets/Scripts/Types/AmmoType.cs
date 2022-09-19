@@ -1,0 +1,4 @@
+enum AmmoType
+{
+    BULLETS, ROCKETS
+};

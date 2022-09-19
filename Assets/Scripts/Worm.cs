@@ -23,6 +23,13 @@ public class Worm : MonoBehaviour
     private float _groundDistance = 0.2f;
     //Components
     private Rigidbody _rigidBody = null;
+    private Weapon _weapon;
+    //Camera
+    private CameraManager _cameraManager = null;
+    private bool _isActive = false;
+
+    public bool GetIsActive() => _isActive;
+    public void SetIsActive(bool activity) { _isActive = activity; }
 
     //Health Functions
     public void SetHealth(float health) { _currentHealth = health; }
@@ -55,7 +62,6 @@ public class Worm : MonoBehaviour
     {
         if (_onGround)
         {
-            _rigidBody.constraints = RigidbodyConstraints.FreezeRotation;
             _rigidBody.AddForce(Vector3.up * _JumpPower, ForceMode.Impulse);
             _onGround = false;
         }
@@ -67,14 +73,15 @@ public class Worm : MonoBehaviour
         if (Physics.Raycast(groundCheck, out hit, _groundDistance))
         {
             _onGround = true;
-            _rigidBody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         }
     }
 
-    public void Aim(float lookDir)
+    public void Aim(Vector2 lookDir)
     {
-        Vector2 rotate = new Vector2(0.0f, lookDir);
+        Vector2 rotate = new Vector2(0.0f, lookDir.y);
         this.transform.localEulerAngles = rotate;
+        Vector2 aimDir = new Vector2(lookDir.x, 0);
+        _weapon.Aim(aimDir);
     }
 
     private void InitializeWorm()
@@ -82,11 +89,18 @@ public class Worm : MonoBehaviour
         _currentHealth = _health;
         _curSpeed = _moveSpeed * Time.fixedDeltaTime;
         _rigidBody = this.GetComponent<Rigidbody>();
+        _cameraManager = FindObjectOfType<CameraManager>();
+        //Switch to manager later
+        _weapon = this.GetComponentInChildren<Weapon>();
         if (_rigidBody == null)
         {
             Debug.Log($"SACRE BLEU");
             return;
         }
+    }
+    public void Fire()
+    {
+        _weapon.Fire();
     }
     private void Start()
     {
@@ -97,6 +111,10 @@ public class Worm : MonoBehaviour
         if (!_onGround)
         {
             Grounder();
+        }
+        if (_isActive)
+        {
+            _cameraManager.SetTarget(this.transform);
         }
     }
 }
