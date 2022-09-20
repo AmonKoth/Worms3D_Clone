@@ -31,6 +31,11 @@ public class Worm : MonoBehaviour
     public bool GetIsActive() => _isActive;
     public void SetIsActive(bool activity) { _isActive = activity; }
 
+    //Weapon
+    private bool _isFired = false;
+
+    public bool GetIsFired() => _isFired;
+
     //Health Functions
     public void SetHealth(float health) { _currentHealth = health; }
     public float GetHealt() => _currentHealth;
@@ -84,6 +89,16 @@ public class Worm : MonoBehaviour
         _weapon.Aim(aimDir);
     }
 
+    public void TurnStart()
+    {
+        if (_rigidBody.IsSleeping())
+        {
+            _rigidBody.WakeUp();
+        }
+        _isFired = false;
+        _isActive = true;
+    }
+
     private void InitializeWorm()
     {
         _currentHealth = _health;
@@ -95,12 +110,17 @@ public class Worm : MonoBehaviour
         if (_rigidBody == null)
         {
             Debug.Log($"SACRE BLEU");
+
             return;
         }
     }
     public void Fire()
     {
-        _weapon.Fire();
+        if (!_isFired)
+        {
+            _weapon.Fire();
+            _isFired = true;
+        }
     }
     private void Start()
     {

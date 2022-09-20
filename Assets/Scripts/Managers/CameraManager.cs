@@ -8,7 +8,7 @@ public class CameraManager : MonoBehaviour
 
     private void Start()
     {
-        if (FindObjectOfType<CameraManager>())
+        if (FindObjectOfType<CameraManager>() != this)
         {
             Destroy(gameObject);
         }
@@ -22,6 +22,10 @@ public class CameraManager : MonoBehaviour
     public void SetTarget(Transform target)
     {
         _virtualCamera.m_LookAt = target;
+        _virtualCamera.m_Follow = target;
+    }
+    public void SetFolow(Transform target)
+    {
         _virtualCamera.m_Follow = target;
     }
 

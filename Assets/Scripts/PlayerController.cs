@@ -22,8 +22,14 @@ public class PlayerController : MonoBehaviour
     private Worm _activeWorm = null;
     private int _activeWormNumber = 0;
     private int _AliveWorms = 0;
+    //Turn
+    private TurnManager _turnManager = null;
+    private bool _isTurn = false;
+    private int _endTurnTimer = 1;
 
-
+    public int GetEndTurnTimer() => _endTurnTimer;
+    public void SetEndTurnTimer(int endTurn) { _endTurnTimer = endTurn; }
+    private bool GetTurn() => _isTurn;
 
     //Handle Inputs
     public void OnMove(InputAction.CallbackContext context)
@@ -38,14 +44,21 @@ public class PlayerController : MonoBehaviour
     {
         if (context.performed)
         {
-            _activeWorm.Fire();
+            if (_isTurn && _activeWorm.GetIsActive() && !_activeWorm.GetIsFired())
+            {
+                _activeWorm.Fire();
+                Invoke("EndTurn", _endTurnTimer);
+            }
         }
     }
     public void OnJump(InputAction.CallbackContext context)
     {
         if (context.performed)
         {
-            _activeWorm.Jump();
+            if (_isTurn)
+            {
+                _activeWorm.Jump();
+            }
         }
     }
     public void OnWormSwitch(InputAction.CallbackContext context)
@@ -68,6 +81,18 @@ public class PlayerController : MonoBehaviour
         _activeWorm.SetIsActive(true);
     }
 
+    public void SetTurn()
+    {
+        _isTurn = true;
+        _activeWorm.TurnStart();
+    }
+    private void EndTurn()
+    {
+        _activeWorm.SetIsActive(false);
+        _isTurn = false;
+        _turnManager.TurnBreak();
+    }
+
     private void HandleAim()
     {
         _lastLookDir += new Vector2(-_lookDirection.y * _ySensitivity, _lookDirection.x * _xSensitivity);
@@ -82,11 +107,16 @@ public class PlayerController : MonoBehaviour
         _activeWorm = worms[_activeWormNumber];
         _activeWorm.SetIsActive(true);
         _AliveWorms = worms.Length;
+        _turnManager = FindObjectOfType<TurnManager>();
+
     }
 
     private void Update()
     {
-        _activeWorm.HandleMovement(_moveDirection);
-        HandleAim();
+        if (_isTurn)
+        {
+            _activeWorm.HandleMovement(_moveDirection);
+            HandleAim();
+        }
     }
 }
