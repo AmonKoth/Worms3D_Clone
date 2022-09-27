@@ -45,6 +45,7 @@ public class Worm : MonoBehaviour
         {
             _rigidBody.WakeUp();
         }
+        Debug.Log($"You'll regret that!");
         _currentHealth -= damage;
         if (_currentHealth <= 0)
         {
@@ -60,8 +61,22 @@ public class Worm : MonoBehaviour
     }
     public void HandleMovement(Vector2 dir)
     {
-        Vector3 move = new Vector3(dir.x, 0.0f, dir.y);
-        _rigidBody.AddForce(move * _moveSpeed * Time.fixedDeltaTime, ForceMode.Impulse);
+        if (dir.y > 0)
+        {
+            _rigidBody.AddForce(this.transform.forward * _moveSpeed * Time.fixedDeltaTime, ForceMode.Impulse);
+        }
+        else if (dir.y < 0)
+        {
+            _rigidBody.AddForce(-this.transform.forward * _moveSpeed * Time.fixedDeltaTime, ForceMode.Impulse);
+        }
+        if (dir.x > 0)
+        {
+            _rigidBody.AddForce(this.transform.right * _moveSpeed * Time.fixedDeltaTime, ForceMode.Impulse);
+        }
+        else if (dir.x < 0)
+        {
+            _rigidBody.AddForce(-this.transform.right * _moveSpeed * Time.fixedDeltaTime, ForceMode.Impulse);
+        }
     }
     public void Jump()
     {
@@ -95,6 +110,7 @@ public class Worm : MonoBehaviour
         {
             _rigidBody.WakeUp();
         }
+        Debug.Log($"YES SIR!");
         _isFired = false;
         _isActive = true;
     }

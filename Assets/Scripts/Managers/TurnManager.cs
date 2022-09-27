@@ -10,6 +10,7 @@ public class TurnManager : MonoBehaviour
     private PlayerController[] _players = null;
     private PlayerController _activePlayer = null;
     private int _numOfCurrentPlayer = 0;
+    private CameraManager _cameraManager = null;
 
     private void TurnSwitcher()
     {
@@ -24,6 +25,7 @@ public class TurnManager : MonoBehaviour
     }
     public void TurnBreak()
     {
+        _cameraManager.SetCameraIdle();
         _activePlayer = null;
         Invoke("TurnSwitcher", _turnEndTimer);
     }
@@ -34,6 +36,7 @@ public class TurnManager : MonoBehaviour
             Destroy(gameObject);
         }
         _players = FindObjectsOfType<PlayerController>();
+        _cameraManager = FindObjectOfType<CameraManager>();
 
         foreach (PlayerController player in _players)
         {

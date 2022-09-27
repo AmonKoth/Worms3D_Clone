@@ -9,17 +9,22 @@ public class Ammo : MonoBehaviour
     [System.Serializable]
     private class AmmoSlot
     {
-        [SerializeField]
-        private AmmoType _ammoType;
-        [SerializeField]
-        private int _ammoCount;
-
-        public AmmoType GetAmmoType() => _ammoType;
-        public int GetAmmoCount() => _ammoCount;
-
-        public void AddAmmo(int count) { _ammoCount += count; }
-        public void ReduceAmmo(int count) { _ammoCount -= count; }
-
+        public AmmoType ammoType;
+        public int ammoCount;
     }
 
+    private AmmoSlot GetAmmoSlot(AmmoType ammoType)
+    {
+        foreach (AmmoSlot ammoSlot in ammoSlots)
+        {
+            if (ammoSlot.ammoType == ammoType)
+            {
+                return ammoSlot;
+            }
+        }
+        return null;
+    }
+    public void ReduceAmmo(AmmoType ammoType) { GetAmmoSlot(ammoType).ammoCount--; }
+    public void AddAmmo(AmmoType ammoType, int count) { GetAmmoSlot(ammoType).ammoCount += count; }
+    public int GetAmmoAmount(AmmoType ammoType) => GetAmmoSlot(ammoType).ammoCount;
 }

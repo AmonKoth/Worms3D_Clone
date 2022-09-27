@@ -1,4 +1,4 @@
-enum AmmoType
+public enum AmmoType
 {
-    BULLETS, ROCKETS
+    BULLETS, ROCKETS, GRENADES
 };

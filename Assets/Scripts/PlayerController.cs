@@ -65,7 +65,10 @@ public class PlayerController : MonoBehaviour
     {
         if (context.performed)
         {
-            ActiveWormChanger();
+            if (_isTurn && _activeWorm.GetIsActive() && !_activeWorm.GetIsFired())
+            {
+                ActiveWormChanger();
+            }
         }
     }
 
@@ -99,7 +102,6 @@ public class PlayerController : MonoBehaviour
         _lastLookDir.x = Mathf.Clamp(_lastLookDir.x, -_xClamp, _xClamp);
         _activeWorm.Aim(_lastLookDir);
     }
-
 
     private void Start()
     {
