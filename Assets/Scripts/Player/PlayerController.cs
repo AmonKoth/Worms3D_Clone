@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -12,16 +13,18 @@ public class PlayerController : MonoBehaviour
     private float _ySensitivity = 0.2f;
     [SerializeField]
     private float _xClamp = 45.0f;
-
+    [SerializeField]
+    private Color _colorOfWorms = Color.yellow;
 
     private Vector2 _moveDirection = new Vector2(0, 0);
     private Vector2 _lookDirection = new Vector2(0, 0);
     private Vector2 _lastLookDir;
     //Worms
-    private Worm[] worms = null;
+    //private Worm[] worms = null;
     private Worm _activeWorm = null;
     private int _activeWormNumber = 0;
-    private int _AliveWorms = 0;
+    private List<Worm> _worms = new List<Worm>();
+
     //Turn
     private TurnManager _turnManager = null;
     private bool _isTurn = false;
@@ -29,7 +32,12 @@ public class PlayerController : MonoBehaviour
 
     public int GetEndTurnTimer() => _endTurnTimer;
     public void SetEndTurnTimer(int endTurn) { _endTurnTimer = endTurn; }
-    private bool GetTurn() => _isTurn;
+    public bool GetTurn() => _isTurn;
+
+    private WeaponWheel _weaponWheel = null;
+    //Events
+    public event Action<Color> HandleColor = delegate { };
+    public event Action<String> SwitchingWorm = delegate { };
 
     //Handle Inputs
     public void OnMove(InputAction.CallbackContext context)
@@ -71,23 +79,47 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+    public void OnWeaponMenu(InputAction.CallbackContext context)
+    {
+        if (context.performed && _isTurn && _activeWorm.GetIsActive() && !_activeWorm.GetIsFired())
+        {
+            _weaponWheel.gameObject.SetActive(!_weaponWheel.gameObject.activeSelf);
+        }
+    }
 
+    public void WeaponSwitch(AmmoType switchedAmmoType)
+    {
+        _activeWorm.SetActiveWeapon(switchedAmmoType);
+    }
+
+    //Worms
     private void ActiveWormChanger()
     {
         _activeWorm.SetIsActive(false);
         _activeWormNumber++;
-        if (_activeWormNumber == worms.Length)
+        if (_activeWormNumber == _worms.Count)
         {
             _activeWormNumber = 0;
         }
-        _activeWorm = worms[_activeWormNumber];
+        //Debug.Log(_worms.Count);
+        //Debug.Log($"Active worm number" + _activeWormNumber);
+        _activeWorm = _worms[_activeWormNumber];
         _activeWorm.SetIsActive(true);
+        _activeWorm.OnHazardCollision += HazardDeath;
+        SwitchingWorm(_activeWorm.transform.name);
+
     }
 
     public void SetTurn()
     {
         _isTurn = true;
+        if (_activeWorm.GetIsDead())
+        {
+            ActiveWormChanger();
+        }
+        //Debug.Log(_activeWorm.transform.name);
         _activeWorm.TurnStart();
+        _activeWorm.OnHazardCollision += HazardDeath;
     }
     private void EndTurn()
     {
@@ -102,15 +134,49 @@ public class PlayerController : MonoBehaviour
         _lastLookDir.x = Mathf.Clamp(_lastLookDir.x, -_xClamp, _xClamp);
         _activeWorm.Aim(_lastLookDir);
     }
+    private void Initializer()
+    {
+        //worms = GetComponentsInChildren<Worm>();
+        foreach (Worm worm in GetComponentsInChildren<Worm>())
+        {
+            _worms.Add(worm);
+        }
+        _activeWorm = _worms[_activeWormNumber];
+        _activeWorm.SetIsActive(true);
+        _turnManager = FindObjectOfType<TurnManager>();
+        HandleColor(_colorOfWorms);
+        _weaponWheel = FindObjectOfType<WeaponWheel>();
+    }
+
+    private void HazardDeath(bool death)
+    {
+        if (death)
+        {
+            UpdateList();
+            //Debug.Log(_worms.Count);
+            if (_isTurn)
+            {
+                EndTurn();
+            }
+        }
+    }
+
+    private void UpdateList()
+    {
+        _worms.Clear();
+        _activeWormNumber = 0;
+        foreach (Worm worm in GetComponentsInChildren<Worm>())
+        {
+            if (!worm.GetIsDead())
+            {
+                _worms.Add(worm);
+            }
+        }
+    }
 
     private void Start()
     {
-        worms = GetComponentsInChildren<Worm>();
-        _activeWorm = worms[_activeWormNumber];
-        _activeWorm.SetIsActive(true);
-        _AliveWorms = worms.Length;
-        _turnManager = FindObjectOfType<TurnManager>();
-
+        Initializer();
     }
 
     private void Update()

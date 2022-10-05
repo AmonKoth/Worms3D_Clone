@@ -7,6 +7,12 @@ public class Projectile : MonoBehaviour
 {
     [SerializeField]
     private AmmoType _ammoType;
+    [SerializeField]
+    private bool _isExplosive = false;
+    [SerializeField]
+    private bool _isGrenade = false;
+    [SerializeField]
+    private float _grenadeTime = 3.0f;
     private Transform _parent = null;
     private Rigidbody _rigidBody = null;
 
@@ -28,6 +34,10 @@ public class Projectile : MonoBehaviour
         _rigidBody.Sleep();
         _rigidBody.AddForce(direction * speed * Time.fixedDeltaTime, ForceMode.Impulse);
         _isFired = true;
+        if (_isGrenade)
+        {
+            Invoke("Explode", _grenadeTime);
+        }
     }
 
     public void Move(Transform location)
@@ -38,13 +48,24 @@ public class Projectile : MonoBehaviour
 
     private void OnCollisionEnter(Collision other)
     {
-        if (other.transform.tag == "Worm")
+        if (!_isGrenade)
         {
-            Worm health = other.transform.GetComponent<Worm>();
-            health.RecieveDamage(20);
+            if (other.transform.tag == "Worm")
+            {
+                Health wormHealth = other.transform.GetComponent<Health>();
+                wormHealth.RecieveDamage(20);
+            }
+            this.transform.parent = _parent;
+            _isFired = false;
+            gameObject.SetActive(false);
         }
-        this.transform.parent = _parent;
-        _isFired = false;
-        gameObject.SetActive(false);
+        if (_isExplosive)
+        {
+            Explode();
+        }
+    }
+    private void Explode()
+    {
+
     }
 }

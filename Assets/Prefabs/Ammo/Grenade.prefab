@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3531509122138135037}
   - component: {fileID: 536185141263959576}
   m_Layer: 0
-  m_Name: Capsule
+  m_Name: GranadeBody
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -92,7 +92,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1945989405775255652, guid: 43644d100bb8b434db650ddc0ce37929, type: 3}
       propertyPath: m_Name
-      value: Granade
+      value: Grenade
       objectReference: {fileID: 0}
     - target: {fileID: 3852347912775105569, guid: 43644d100bb8b434db650ddc0ce37929, type: 3}
       propertyPath: m_Height
@@ -102,9 +102,25 @@ PrefabInstance:
       propertyPath: m_Radius
       value: 0.06
       objectReference: {fileID: 0}
+    - target: {fileID: 3852347912775105569, guid: 43644d100bb8b434db650ddc0ce37929, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4937262008791655983, guid: 43644d100bb8b434db650ddc0ce37929, type: 3}
       propertyPath: _ammoType
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4937262008791655983, guid: 43644d100bb8b434db650ddc0ce37929, type: 3}
+      propertyPath: _isGrenade
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4937262008791655983, guid: 43644d100bb8b434db650ddc0ce37929, type: 3}
+      propertyPath: _grenadeTime
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4937262008791655983, guid: 43644d100bb8b434db650ddc0ce37929, type: 3}
+      propertyPath: _isExplosive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6617391506754506036, guid: 43644d100bb8b434db650ddc0ce37929, type: 3}
       propertyPath: m_RootOrder

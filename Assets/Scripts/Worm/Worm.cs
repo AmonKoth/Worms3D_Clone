@@ -1,16 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
+
+[RequireComponent(typeof(Rigidbody), typeof(Ammo))]
 public class Worm : MonoBehaviour
 {
     [Header("Health")]
     [SerializeField]
-    private float _health = 100.0f;
+    private int _health = 100;
     [SerializeField]
-    private float _deathTime = 3.0f;
-
-    private float _currentHealth = 0f;
+    private float _deathTime = 2.0f;
 
     [Header("Movement")]
     [SerializeField]
@@ -23,42 +24,24 @@ public class Worm : MonoBehaviour
     private float _groundDistance = 0.2f;
     //Components
     private Rigidbody _rigidBody = null;
-    private Weapon _weapon;
+    private WeaponManager _weapons = null;
+    private Health _wormHealth = null;
     //Camera
     private CameraManager _cameraManager = null;
     private bool _isActive = false;
+    private bool _isDead = false;
 
     public bool GetIsActive() => _isActive;
     public void SetIsActive(bool activity) { _isActive = activity; }
+    public bool GetIsDead() => _isDead;
+    public void SetIsDead(bool dead) { _isDead = dead; }
 
     //Weapon
     private bool _isFired = false;
-
     public bool GetIsFired() => _isFired;
 
-    //Health Functions
-    public void SetHealth(float health) { _currentHealth = health; }
-    public float GetHealt() => _currentHealth;
-    public void RecieveDamage(float damage)
-    {
-        if (_rigidBody.IsSleeping())
-        {
-            _rigidBody.WakeUp();
-        }
-        Debug.Log($"You'll regret that!");
-        _currentHealth -= damage;
-        if (_currentHealth <= 0)
-        {
-            Invoke("HandleDeath", _deathTime);
-        }
-    }
-    public void Heal(float heal) { _currentHealth += heal; }
+    public event Action<bool> OnHazardCollision = delegate { };
 
-
-    private void HandleDeath()
-    {
-        gameObject.SetActive(false);
-    }
     public void HandleMovement(Vector2 dir)
     {
         if (dir.y > 0)
@@ -78,6 +61,7 @@ public class Worm : MonoBehaviour
             _rigidBody.AddForce(-this.transform.right * _moveSpeed * Time.fixedDeltaTime, ForceMode.Impulse);
         }
     }
+
     public void Jump()
     {
         if (_onGround)
@@ -86,6 +70,7 @@ public class Worm : MonoBehaviour
             _onGround = false;
         }
     }
+
     private void Grounder()
     {
         RaycastHit hit;
@@ -101,7 +86,7 @@ public class Worm : MonoBehaviour
         Vector2 rotate = new Vector2(0.0f, lookDir.y);
         this.transform.localEulerAngles = rotate;
         Vector2 aimDir = new Vector2(lookDir.x, 0);
-        _weapon.Aim(aimDir);
+        _weapons.Aim(aimDir);
     }
 
     public void TurnStart()
@@ -110,47 +95,93 @@ public class Worm : MonoBehaviour
         {
             _rigidBody.WakeUp();
         }
-        Debug.Log($"YES SIR!");
+        //        Debug.Log($"YES SIR!");
         _isFired = false;
         _isActive = true;
+        _cameraManager.SetTarget(this.transform);
+    }
+    public void SetActiveWeapon(AmmoType ammoType)
+    {
+        _weapons.SwitchWeapon(ammoType);
     }
 
     private void InitializeWorm()
     {
-        _currentHealth = _health;
+        //Health
+        HealthInitialize();
         _curSpeed = _moveSpeed * Time.fixedDeltaTime;
         _rigidBody = this.GetComponent<Rigidbody>();
         _cameraManager = FindObjectOfType<CameraManager>();
-        //Switch to manager later
-        _weapon = this.GetComponentInChildren<Weapon>();
+        _weapons = this.GetComponentInChildren<WeaponManager>();
+        GetComponentInParent<PlayerController>().SwitchingWorm += WormSwitched;
         if (_rigidBody == null)
         {
-            Debug.Log($"SACRE BLEU");
+            Debug.Log($"RigidBody Missing");
 
             return;
         }
     }
+    private void WormSwitched(String worm)
+    {
+        if (worm == this.transform.name)
+        {
+            _cameraManager.SetTarget(this.transform);
+        }
+    }
+    private void HealthInitialize()
+    {
+        _wormHealth = GetComponent<Health>();
+        if (_wormHealth == null)
+        {
+            this.gameObject.AddComponent<Health>();
+        }
+        _wormHealth.SetStartHealth(_health);
+        _wormHealth.SetDeathTime(_deathTime);
+        _wormHealth.OnDeath += WormDied;
+    }
+
     public void Fire()
     {
         if (!_isFired)
         {
-            _weapon.Fire();
+            _weapons.Fire();
             _isFired = true;
         }
     }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "Water")
+        {
+            OnHazardCollision(true);
+        }
+    }
+    private void WormDied(bool dead)
+    {
+        foreach (Transform transform in GetComponentsInChildren<Transform>())
+        {
+            if (transform != this.transform)
+            {
+                transform.gameObject.SetActive(false);
+            }
+        }
+        if (dead)
+        {
+            _rigidBody.constraints = RigidbodyConstraints.FreezePosition;
+            _isDead = true;
+            _isActive = false;
+        }
+    }
+
     private void Start()
     {
         InitializeWorm();
     }
+
     private void Update()
     {
         if (!_onGround)
         {
             Grounder();
-        }
-        if (_isActive)
-        {
-            _cameraManager.SetTarget(this.transform);
         }
     }
 }

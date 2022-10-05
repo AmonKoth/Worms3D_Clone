@@ -18,7 +18,6 @@ public class CameraManager : MonoBehaviour
         // {
         //     Instantiate(new Cinemachine.CinemachineVirtualCamera(), this.transform.position, Quaternion.identity);
         // }
-        SetCameraIdle();
     }
 
     public void SetTarget(Transform target)

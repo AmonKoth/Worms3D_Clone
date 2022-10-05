@@ -7,13 +7,15 @@ public class Weapon : MonoBehaviour
     [SerializeField]
     private AmmoType _ammoType;
     [SerializeField]
-    private float _bulletSpeed = 300.0f;
+    private float _projectileSpeed = 300.0f;
 
     private Projectile _ammoPrefab = null;
     //Components
     private Barrel _gunBarrel = null;
     private Ammo _weaponAmmo = null;
     private int _ammocount = 0;
+
+    public AmmoType GetAmmoType() => _ammoType;
 
     public void Fire()
     {
@@ -25,15 +27,11 @@ public class Weapon : MonoBehaviour
         }
         _ammoPrefab.gameObject.SetActive(true);
         _ammoPrefab.Move(_gunBarrel.transform);
-        _ammoPrefab.AddForce(_gunBarrel.transform.forward, _bulletSpeed);
+        _ammoPrefab.AddForce(_gunBarrel.transform.forward, _projectileSpeed);
         Debug.Log($"FIRE!");
         _weaponAmmo.ReduceAmmo(_ammoType);
     }
 
-    public void Aim(Vector2 aimLocation)
-    {
-        this.transform.localEulerAngles = aimLocation;
-    }
     private void InitializeWeapon()
     {
         _weaponAmmo = GetComponentInParent<Ammo>();
@@ -46,9 +44,20 @@ public class Weapon : MonoBehaviour
                 _ammoPrefab = projectile;
             }
         }
-        if (_gunBarrel == null || _weaponAmmo == null || _ammoPrefab == null)
+        if (_gunBarrel == null)
         {
-            Debug.Log($"OH no Component missing!!!");
+            Debug.Log($"OH no gunbarrel missing!!!");
+            Debug.Log(this.name);
+        }
+        if (_weaponAmmo == null)
+        {
+            Debug.Log($"OH no ammo in parent missing!!!");
+            Debug.Log(this.name);
+        }
+        if (_ammoPrefab == null)
+        {
+            Debug.Log($"OH no ammoprefab missing!!!");
+            Debug.Log(this.name);
         }
     }
 
