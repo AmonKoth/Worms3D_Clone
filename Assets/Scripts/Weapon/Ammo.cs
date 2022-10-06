@@ -5,7 +5,6 @@ using UnityEngine;
 public class Ammo : MonoBehaviour
 {
     [SerializeField] AmmoSlot[] ammoSlots;
-
     [System.Serializable]
     private class AmmoSlot
     {
@@ -27,4 +26,5 @@ public class Ammo : MonoBehaviour
     public void ReduceAmmo(AmmoType ammoType) { GetAmmoSlot(ammoType).ammoCount--; }
     public void AddAmmo(AmmoType ammoType, int count) { GetAmmoSlot(ammoType).ammoCount += count; }
     public int GetAmmoAmount(AmmoType ammoType) => GetAmmoSlot(ammoType).ammoCount;
+
 }

@@ -16,6 +16,10 @@ public class Weapon : MonoBehaviour
     private int _ammocount = 0;
 
     public AmmoType GetAmmoType() => _ammoType;
+    public int GetAmmoCount()
+    {
+        return _weaponAmmo.GetAmmoAmount(_ammoType);
+    }
 
     public void Fire()
     {

@@ -28,6 +28,12 @@ public class Health : MonoBehaviour
             Invoke("HandleDeath", _deathTime);
         }
     }
+    private void OnParticleCollision(GameObject other)
+    {
+        int damage = other.GetComponent<Explosion>().GetExplosiveDamage();
+        RecieveDamage(damage);
+    }
+
     void Heal(int heal)
     {
         _currentHealth += heal;
@@ -41,23 +47,20 @@ public class Health : MonoBehaviour
     {
         Debug.Log($"BYE BYE");
         OnDeath(true);
-        //gameObject.SetActive(false);
-        // Destroy(gameObject);
     }
     private void HealthComponentInitialize()
     {
         _currentHealth = _startHealth;
     }
-    private void HazardCollision(bool iscollided)
+    private void OnTriggerEnter(Collider other)
     {
-        if (iscollided)
+        if (other.gameObject.tag == "Water")
         {
             _currentHealth = 0;
             HealthModified();
             HandleDeath();
         }
     }
-
     //Handles the healthbar stuff
     private void HealthModified()
     {
@@ -66,7 +69,6 @@ public class Health : MonoBehaviour
     }
     private void Start()
     {
-        GetComponent<Worm>().OnHazardCollision += HazardCollision;
         Invoke("HealthComponentInitialize", 0.5f);
     }
 

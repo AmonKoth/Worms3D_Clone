@@ -1,8 +1,0 @@
-Camera = After turn ends move to fixed camera spot(fixed)
-
-
-Death= fix the bug related to one's death (fixed)
-
-
-Add explosive to grenade rocket, particle system
-Add if collided with particles

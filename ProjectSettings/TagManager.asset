@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Worm
   - Water
+  - Ground
   layers:
   - Default
   - TransparentFX

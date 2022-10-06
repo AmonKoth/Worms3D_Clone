@@ -6,6 +6,7 @@ public class WeaponManager : MonoBehaviour
 {
     private AmmoType _currentWeapon = AmmoType.BULLETS;
     private Weapon _activeweapon = null;
+    private AmmoText _ammotext = null;
     private bool _canSwitch = true;
     public bool GetCanSwitch() => _canSwitch;
 
@@ -23,6 +24,7 @@ public class WeaponManager : MonoBehaviour
                 _weaponList.Add(weapon.GetAmmoType(), weapon);
             }
         }
+        _ammotext = FindObjectOfType<AmmoText>();
         StartCoroutine("OnGameStart", _currentWeapon);
     }
 
@@ -38,9 +40,11 @@ public class WeaponManager : MonoBehaviour
                 weaponToEnable.gameObject.SetActive(true);
                 _currentWeapon = weaponToEnable.GetAmmoType();
                 _activeweapon = weaponToEnable;
+                _ammotext.SetAmmoText(_activeweapon.GetAmmoCount().ToString());
             }
         }
     }
+
     IEnumerator OnGameStart(AmmoType ammoType)
     {
         yield return new WaitForSeconds(0.3f);
@@ -49,6 +53,10 @@ public class WeaponManager : MonoBehaviour
             if (weapon.GetAmmoType() != ammoType)
             {
                 weapon.gameObject.SetActive(false);
+            }
+            if (weapon.GetAmmoType() == ammoType)
+            {
+                _ammotext.SetAmmoText(weapon.GetAmmoCount().ToString());
             }
         }
     }
@@ -60,6 +68,7 @@ public class WeaponManager : MonoBehaviour
     public void Fire()
     {
         _activeweapon.Fire();
+        _ammotext.ClearText();
     }
 
     private void Start()

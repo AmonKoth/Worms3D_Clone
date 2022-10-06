@@ -10,7 +10,6 @@ public class AmmoPickup : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log($"Trigger REgister");
         if (other.gameObject.tag == "Worm")
         {
             int randomNumber = Random.Range(0, 3);

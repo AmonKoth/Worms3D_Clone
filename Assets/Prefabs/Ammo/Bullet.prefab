@@ -106,6 +106,10 @@ PrefabInstance:
       propertyPath: _ammoType
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4937262008791655983, guid: 43644d100bb8b434db650ddc0ce37929, type: 3}
+      propertyPath: _directHitDamage
+      value: 40
+      objectReference: {fileID: 0}
     - target: {fileID: 6617391506754506036, guid: 43644d100bb8b434db650ddc0ce37929, type: 3}
       propertyPath: m_RootOrder
       value: 0

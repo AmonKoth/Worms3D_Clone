@@ -274,11 +274,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ammoSlots:
   - ammoType: 0
-    ammoCount: 1
+    ammoCount: 5
   - ammoType: 1
-    ammoCount: 1
+    ammoCount: 2
   - ammoType: 2
-    ammoCount: 1
+    ammoCount: 3
 --- !u!54 &7092510956991405241
 Rigidbody:
   m_ObjectHideFlags: 0

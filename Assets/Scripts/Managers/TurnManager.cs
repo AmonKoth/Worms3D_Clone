@@ -1,6 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class TurnManager : MonoBehaviour
 {
@@ -11,26 +11,35 @@ public class TurnManager : MonoBehaviour
     private PlayerController _activePlayer = null;
     private CameraManager _cameraManager = null;
     private TurnText _turnTextIndicator = null;
+    private AmmoText _ammoText = null;
+
     private int _numOfCurrentPlayer = 0;
+    private bool _gameFinished = false;
+
+    public event Action<bool> TurnPassed = delegate { };
 
     private void TurnSwitcher()
     {
-        _numOfCurrentPlayer++;
-        if (_numOfCurrentPlayer >= _players.Length)
+        if (!_gameFinished)
         {
-            _numOfCurrentPlayer = 0;
+            _numOfCurrentPlayer++;
+            if (_numOfCurrentPlayer >= _players.Length)
+            {
+                _numOfCurrentPlayer = 0;
+            }
+            _activePlayer = _players[_numOfCurrentPlayer];
+            string text = _activePlayer.name + "'s turn";
+            _turnTextIndicator.SetText(text);
+            _activePlayer.SetTurn();
         }
-        _activePlayer = _players[_numOfCurrentPlayer];
-        string text = _activePlayer.name + "'s turn";
-        _turnTextIndicator.SetText(text);
-        _activePlayer.SetTurn();
-
     }
     public void TurnBreak()
     {
         _cameraManager.SetCameraIdle();
         _activePlayer = null;
+        _ammoText.ClearText();
         Invoke("TurnSwitcher", _turnEndTimer);
+        TurnPassed(true);
     }
 
     private void Start()
@@ -42,13 +51,28 @@ public class TurnManager : MonoBehaviour
         _players = FindObjectsOfType<PlayerController>();
         _cameraManager = FindObjectOfType<CameraManager>();
         _turnTextIndicator = FindObjectOfType<TurnText>();
+        _ammoText = FindObjectOfType<AmmoText>();
         foreach (PlayerController player in _players)
         {
             player.SetEndTurnTimer(_turnEndTimer);
+            player.IJustLost += GameManager;
         }
         // _activePlayer = _players[_numOfCurrentPlayer];
         // _activePlayer.SetTurn();
         //Debug.Log(_players.Length);
         TurnBreak();
+    }
+
+    private void GameManager(string loser)
+    {
+        _turnTextIndicator.SetText(loser + " Lost the game");
+        _gameFinished = true;
+        Invoke("RestartScene", 5.0f);
+    }
+
+    private void RestartScene()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+
     }
 }

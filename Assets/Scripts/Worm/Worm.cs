@@ -40,8 +40,6 @@ public class Worm : MonoBehaviour
     private bool _isFired = false;
     public bool GetIsFired() => _isFired;
 
-    public event Action<bool> OnHazardCollision = delegate { };
-
     public void HandleMovement(Vector2 dir)
     {
         if (dir.y > 0)
@@ -146,13 +144,6 @@ public class Worm : MonoBehaviour
         {
             _weapons.Fire();
             _isFired = true;
-        }
-    }
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.tag == "Water")
-        {
-            OnHazardCollision(true);
         }
     }
     private void WormDied(bool dead)

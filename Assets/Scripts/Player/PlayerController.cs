@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     //Input
+    [Header("Input")]
     [SerializeField]
     private float _xSensitivity = 0.2f;
     [SerializeField]
@@ -15,6 +16,16 @@ public class PlayerController : MonoBehaviour
     private float _xClamp = 45.0f;
     [SerializeField]
     private Color _colorOfWorms = Color.yellow;
+    //Worm Placement
+    [Header("Worm Placement")]
+    [SerializeField]
+    private GameObject _placeBeacon = null;
+    [SerializeField]
+    private float _maxXBounds = 20f;
+    [SerializeField]
+    private float _maxZBounds = 20f;
+    [SerializeField]
+    private float _maxCheckDistance = 20f;
 
     private Vector2 _moveDirection = new Vector2(0, 0);
     private Vector2 _lookDirection = new Vector2(0, 0);
@@ -24,20 +35,24 @@ public class PlayerController : MonoBehaviour
     private Worm _activeWorm = null;
     private int _activeWormNumber = 0;
     private List<Worm> _worms = new List<Worm>();
+    private int _aliveWorms = 0;
 
     //Turn
     private TurnManager _turnManager = null;
     private bool _isTurn = false;
     private int _endTurnTimer = 1;
+    private bool _isLost = false;
 
     public int GetEndTurnTimer() => _endTurnTimer;
     public void SetEndTurnTimer(int endTurn) { _endTurnTimer = endTurn; }
     public bool GetTurn() => _isTurn;
+    public bool GetIsLost() => _isLost;
 
     private WeaponWheel _weaponWheel = null;
     //Events
     public event Action<Color> HandleColor = delegate { };
     public event Action<String> SwitchingWorm = delegate { };
+    public event Action<string> IJustLost = delegate { };
 
     //Handle Inputs
     public void OnMove(InputAction.CallbackContext context)
@@ -101,13 +116,9 @@ public class PlayerController : MonoBehaviour
         {
             _activeWormNumber = 0;
         }
-        //Debug.Log(_worms.Count);
-        //Debug.Log($"Active worm number" + _activeWormNumber);
         _activeWorm = _worms[_activeWormNumber];
         _activeWorm.SetIsActive(true);
-        _activeWorm.OnHazardCollision += HazardDeath;
         SwitchingWorm(_activeWorm.transform.name);
-
     }
 
     public void SetTurn()
@@ -117,9 +128,7 @@ public class PlayerController : MonoBehaviour
         {
             ActiveWormChanger();
         }
-        //Debug.Log(_activeWorm.transform.name);
         _activeWorm.TurnStart();
-        _activeWorm.OnHazardCollision += HazardDeath;
     }
     private void EndTurn()
     {
@@ -136,10 +145,11 @@ public class PlayerController : MonoBehaviour
     }
     private void Initializer()
     {
-        //worms = GetComponentsInChildren<Worm>();
         foreach (Worm worm in GetComponentsInChildren<Worm>())
         {
             _worms.Add(worm);
+            _aliveWorms++;
+            worm.GetComponent<Health>().OnDeath += Death;
         }
         _activeWorm = _worms[_activeWormNumber];
         _activeWorm.SetIsActive(true);
@@ -148,7 +158,7 @@ public class PlayerController : MonoBehaviour
         _weaponWheel = FindObjectOfType<WeaponWheel>();
     }
 
-    private void HazardDeath(bool death)
+    private void Death(bool death)
     {
         if (death)
         {
@@ -165,18 +175,52 @@ public class PlayerController : MonoBehaviour
     {
         _worms.Clear();
         _activeWormNumber = 0;
-        foreach (Worm worm in GetComponentsInChildren<Worm>())
+        _aliveWorms--;
+        if (_aliveWorms == 0)
         {
-            if (!worm.GetIsDead())
+            IJustLost(this.name);
+        }
+        else
+        {
+            foreach (Worm worm in GetComponentsInChildren<Worm>())
             {
-                _worms.Add(worm);
+                if (!worm.GetIsDead())
+                {
+                    _worms.Add(worm);
+                }
             }
         }
     }
 
+    private void PlaceWorms(Worm worm)
+    {
+        PickRandomLocation();
+        RaycastHit groundHit;
+        Ray groundCheck = new Ray(_placeBeacon.transform.position, Vector3.down * _maxCheckDistance);
+        Debug.Log($"");
+        if (Physics.Raycast(groundCheck, out groundHit, _maxCheckDistance))
+        {
+            if (groundHit.transform.tag == "Ground")
+            {
+                worm.transform.position = _placeBeacon.transform.position;
+            }
+            else
+            {
+                PlaceWorms(worm);
+            }
+        }
+    }
+    private void PickRandomLocation()
+    {
+        _placeBeacon.transform.position = new Vector3(UnityEngine.Random.Range(-_maxXBounds, _maxXBounds + 1), 10, UnityEngine.Random.Range(-_maxZBounds, _maxZBounds + 1));
+    }
     private void Start()
     {
         Initializer();
+        foreach (Worm worm in _worms)
+        {
+            PlaceWorms(worm);
+        }
     }
 
     private void Update()

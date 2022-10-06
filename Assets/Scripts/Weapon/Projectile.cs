@@ -8,6 +8,8 @@ public class Projectile : MonoBehaviour
     [SerializeField]
     private AmmoType _ammoType;
     [SerializeField]
+    private int _directHitDamage = 30;
+    [SerializeField]
     private bool _isExplosive = false;
     [SerializeField]
     private bool _isGrenade = false;
@@ -15,6 +17,7 @@ public class Projectile : MonoBehaviour
     private float _grenadeTime = 3.0f;
     private Transform _parent = null;
     private Rigidbody _rigidBody = null;
+    private Explosion _explosion = null;
 
     private bool _isFired = false;
     public AmmoType GetAmmoType() => _ammoType;
@@ -27,6 +30,7 @@ public class Projectile : MonoBehaviour
         {
             _rigidBody = gameObject.AddComponent<Rigidbody>();
         }
+        _explosion = FindObjectOfType<Explosion>();
     }
 
     public void AddForce(Vector3 direction, float speed)
@@ -53,19 +57,20 @@ public class Projectile : MonoBehaviour
             if (other.transform.tag == "Worm")
             {
                 Health wormHealth = other.transform.GetComponent<Health>();
-                wormHealth.RecieveDamage(20);
+                wormHealth.RecieveDamage(_directHitDamage);
             }
             this.transform.parent = _parent;
             _isFired = false;
             gameObject.SetActive(false);
         }
-        if (_isExplosive)
+        if (!_isGrenade && _isExplosive)
         {
             Explode();
         }
     }
     private void Explode()
     {
-
+        _explosion.PlayExplosion(this.transform.position);
+        gameObject.SetActive(false);
     }
 }

@@ -1,14 +1,1 @@
-!!!!!! POLISH !!!!!!
-
-
-(Done) Change the weapon system so that it has multiple weapons that uses different ammos' like bullets rockets grenades.
-
-(Gone with Projectiles that exists in the game only active when fired, maybe add object pooling(no need) for them?) Think of a way to impelemnt weapons ie: raycast for hitscans, projectile ( either particle or object) etc.
-
 Destructible terrain (maybe voxels?)
-
-add ammo collectibles, and spawn them aroun the map
-
-add ui-particle stuff
-
-add weapon manager to worms for weapon switching, make it work with ui 
