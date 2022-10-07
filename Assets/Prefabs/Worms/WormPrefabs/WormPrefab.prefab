@@ -276,9 +276,9 @@ MonoBehaviour:
   - ammoType: 0
     ammoCount: 5
   - ammoType: 1
-    ammoCount: 2
+    ammoCount: 1
   - ammoType: 2
-    ammoCount: 3
+    ammoCount: 2
 --- !u!54 &7092510956991405241
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -136,6 +136,11 @@ public class Worm : MonoBehaviour
         _wormHealth.SetStartHealth(_health);
         _wormHealth.SetDeathTime(_deathTime);
         _wormHealth.OnDeath += WormDied;
+        _wormHealth.OnExplosiveDamage += ExplosionPhysics;
+    }
+    private void ExplosionPhysics(GameObject explosion)
+    {
+        _rigidBody.AddExplosionForce(5, explosion.transform.position, 3, 3, ForceMode.Impulse);
     }
 
     public void Fire()

@@ -197,7 +197,6 @@ public class PlayerController : MonoBehaviour
         PickRandomLocation();
         RaycastHit groundHit;
         Ray groundCheck = new Ray(_placeBeacon.transform.position, Vector3.down * _maxCheckDistance);
-        Debug.Log($"");
         if (Physics.Raycast(groundCheck, out groundHit, _maxCheckDistance))
         {
             if (groundHit.transform.tag == "Ground")

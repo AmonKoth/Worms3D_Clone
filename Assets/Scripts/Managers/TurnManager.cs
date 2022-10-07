@@ -37,7 +37,6 @@ public class TurnManager : MonoBehaviour
     {
         _cameraManager.SetCameraIdle();
         _activePlayer = null;
-        _ammoText.ClearText();
         Invoke("TurnSwitcher", _turnEndTimer);
         TurnPassed(true);
     }

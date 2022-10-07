@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 
+[RequireComponent(typeof(Worm))]
 public class Health : MonoBehaviour
 {
     //Health Values
@@ -8,15 +9,15 @@ public class Health : MonoBehaviour
     private float _deathTime = 0f;
     private int _currentHealth = 0;
 
+
     public void SetStartHealth(int health) => _startHealth = health;
     public int GetHealth() => _currentHealth;
     public void SetDeathTime(float time) => _deathTime = time;
 
     //Health Bar
     public event Action<float> OnHealthChanged = delegate { };
-
-    //ded event add
     public event Action<bool> OnDeath = delegate { };
+    public event Action<GameObject> OnExplosiveDamage = delegate { };
 
     public void RecieveDamage(int damage)
     {
@@ -32,6 +33,7 @@ public class Health : MonoBehaviour
     {
         int damage = other.GetComponent<Explosion>().GetExplosiveDamage();
         RecieveDamage(damage);
+        OnExplosiveDamage(other);
     }
 
     void Heal(int heal)
