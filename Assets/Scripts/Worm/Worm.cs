@@ -26,6 +26,7 @@ public class Worm : MonoBehaviour
     private Rigidbody _rigidBody = null;
     private WeaponManager _weapons = null;
     private Health _wormHealth = null;
+
     //Camera
     private CameraManager _cameraManager = null;
     private bool _isActive = false;

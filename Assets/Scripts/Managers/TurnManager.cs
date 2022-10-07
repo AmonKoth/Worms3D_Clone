@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class TurnManager : MonoBehaviour
 {
@@ -66,12 +65,7 @@ public class TurnManager : MonoBehaviour
     {
         _turnTextIndicator.SetText(loser + " Lost the game");
         _gameFinished = true;
-        Invoke("RestartScene", 5.0f);
-    }
-
-    private void RestartScene()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 
     }
+
 }

@@ -42,6 +42,7 @@ public class PlayerController : MonoBehaviour
     private bool _isTurn = false;
     private int _endTurnTimer = 1;
     private bool _isLost = false;
+    private bool _isTurnEnding = false;
 
     public int GetEndTurnTimer() => _endTurnTimer;
     public void SetEndTurnTimer(int endTurn) { _endTurnTimer = endTurn; }
@@ -70,6 +71,7 @@ public class PlayerController : MonoBehaviour
             if (_isTurn && _activeWorm.GetIsActive() && !_activeWorm.GetIsFired())
             {
                 _activeWorm.Fire();
+                _isTurnEnding = true;
                 Invoke("EndTurn", _endTurnTimer);
             }
         }
@@ -134,6 +136,7 @@ public class PlayerController : MonoBehaviour
     {
         _activeWorm.SetIsActive(false);
         _isTurn = false;
+        _isTurnEnding = false;
         _turnManager.TurnBreak();
     }
 
@@ -164,7 +167,7 @@ public class PlayerController : MonoBehaviour
         {
             UpdateList();
             //Debug.Log(_worms.Count);
-            if (_isTurn)
+            if (_isTurn && !_isTurnEnding)
             {
                 EndTurn();
             }

@@ -10,10 +10,12 @@ public class Health : MonoBehaviour
     private int _currentHealth = 0;
 
 
+
     public void SetStartHealth(int health) => _startHealth = health;
     public int GetHealth() => _currentHealth;
     public void SetDeathTime(float time) => _deathTime = time;
 
+    private Explosion _explosion = null;
     //Health Bar
     public event Action<float> OnHealthChanged = delegate { };
     public event Action<bool> OnDeath = delegate { };
@@ -48,11 +50,14 @@ public class Health : MonoBehaviour
     private void HandleDeath()
     {
         Debug.Log($"BYE BYE");
+        this.GetComponent<CapsuleCollider>().enabled = false;
+        _explosion.PlayExplosion(this.transform.position);
         OnDeath(true);
     }
     private void HealthComponentInitialize()
     {
         _currentHealth = _startHealth;
+        _explosion = FindObjectOfType<Explosion>();
     }
     private void OnTriggerEnter(Collider other)
     {
